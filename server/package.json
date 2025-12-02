@@ -1,0 +1,15 @@
+{
+  "name": "who_am_i_game_server",
+  "version": "1.0.0",
+  "description": "",
+  "license": "MIT",
+  "author": "EvGamer",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}
