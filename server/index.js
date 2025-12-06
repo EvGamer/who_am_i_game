@@ -17,4 +17,4 @@ wss.on('connection', function connection(connection) {
   connection.send('something');
 });
 
-server.listen(80)
+server.listen(8080);

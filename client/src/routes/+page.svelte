@@ -4,13 +4,12 @@
   let message = $state("standing by");
 
   $effect(() => {
-    const hostname = window.location.hostname
-    const socket = new WebSocket(`ws:\\${hostname}`);
+    const hostname = window.location.hostname;
+    const socket = new WebSocket(`http://${hostname}/api/`, ["ws"]);
 
     socket.addEventListener("message", (event) => {
       message = event.data;
-    })
-
+    });
   })
 </script>
 
