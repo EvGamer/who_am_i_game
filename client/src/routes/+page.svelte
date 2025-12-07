@@ -70,7 +70,7 @@
 
 <div class="root">
   <div class="content">
-    {#if isCharacterSuggested}
+    {#if isCharacterSuggested || isGameStarted}
       <article class="screen">
         <header>Игроки</header>
         <section class="content players">
@@ -98,7 +98,7 @@
         <header>Введите ваше имя и персонажа</header>
         <section class="content form">
           <div class="field">
-            <label for="player">Имя</label>
+            <label for="player">Ваше имя</label>
             <input name="player" bind:value={currentPlayerName} />
           </div>
           <div class="field">
