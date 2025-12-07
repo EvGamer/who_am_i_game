@@ -1,6 +1,6 @@
 <script>
   import { PUBLIC_HOST } from "$env/static/public";
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
 
   const CURRENT_PLAYER_NAME_STORAGE = "current_player_name"; 
 
@@ -13,35 +13,37 @@
     players.some((player) => player.name === currentPlayerName && player.characterSuggestion)
   )
   let isGameStarted = $state(false);
-  $inspect(players);
-
 
   let socket = null;
+
+  const handleSocketMessage = (event) => {
+    const { type, payload } = JSON.parse(event.data);
+    console.log("message", type, payload)
+    switch (type) {
+      case "game_state_changed":
+        players = payload.players;
+        isGameStarted = payload.isStarted;
+        break;
+      default:
+        break;
+    }
+  }
+
+  function connectToSocket() {
+    const hostname = window.location.hostname;
+    socket = new WebSocket(`http://${hostname}/api/`);
+
+    socket.addEventListener("message", handleSocketMessage);
+
+    socket.addEventListener("close", connectToSocket)
+  }
 
   onMount(() => {
     currentPlayerName = window.localStorage.getItem(CURRENT_PLAYER_NAME_STORAGE);
     console.log(currentPlayerName);
 
-    const hostname = window.location.hostname;
-    socket = new WebSocket(`http://${hostname}/api/`);
-
-    socket.addEventListener("message", (event) => {
-      const { type, payload } = JSON.parse(event.data);
-      console.log("message", type, payload)
-      switch (type) {
-        case "game_state_changed":
-          players = payload.players;
-          isGameStarted = payload.isStarted;
-          break;
-        default:
-          break;
-      }
-    });
+    connectToSocket();
   });
-
-  onDestroy(() => {
-    socket?.close();
-  })
 
   const submitSuggestion = () => {
     window.localStorage.setItem(CURRENT_PLAYER_NAME_STORAGE, currentPlayerName);
