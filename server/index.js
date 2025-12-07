@@ -1,7 +1,7 @@
 import { WebSocketServer } from 'ws';
 import { createServer } from "http";
 
-import { GameState } from "./game-state";
+import { GameState } from "./game-state.mjs";
 
 const server = createServer();
 
@@ -9,7 +9,7 @@ const wss = new WebSocketServer({ server });
 
 const gameState = new GameState();
 
-wss.on('connection', function connection(connection) {
+wss.on('connection', (connection) => {
   const changeListener = ({ isStarted, players }) => {
     connection.send(JSON.stringify({
       type: "game_state_changed",
@@ -18,28 +18,34 @@ wss.on('connection', function connection(connection) {
   };
 
   gameState.addChangeListener(changeListener);
+  changeListener(gameState);
 
   connection.on('error', console.error);
 
-  connection.on('message', function message(data) {
-    const data = JSON.parse(data);
+  connection.on('message', (data) => {
+    const { type, payload } = JSON.parse(data);
 
-    switch (data.type) {
+    switch (type) {
       case "character_submitted":
-        gameState.submitCharacter(data.name, data.character);
+        console.log(`"${payload.character}" submitted by ${payload.name}`)
+        gameState.submitCharacter(payload.name, payload.character);
+        break;
       case "game_started":
+        console.log("Game started");
         gameState.start();
+        break;
       case "game_reset":
+        console.log("Game reset");
         gameState.reset();
+        break;
       default:
         break;
     }
   });
-
-  connection.send('something');
 
   connection.on("close", () => {
     gameState.removeChangeListener(changeListener);
   })
 });
 
+server.listen(8080);

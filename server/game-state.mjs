@@ -1,6 +1,6 @@
 
-const getRandomIndex = (length, start = 0) => {
-  return Math.floor((length - start) * Math.random()) + start;
+const getRandomIndex = (length) => {
+  return Math.floor((length) * Math.random());
 }
 
 export class GameState {
@@ -16,7 +16,7 @@ export class GameState {
   }
 
   removeChangeListener(callback) {
-    this._changeListeners.remove(callback);
+    this._changeListeners.delete(callback);
   }
 
   emitChange() {
@@ -35,9 +35,11 @@ export class GameState {
   }
 
   assignPlayerCharacters() {
-    this.players.forEach((player, i, players) => {
-      const otherPlayerIndex = getRandomIndex(players.length, i + 1); 
-      player.character = players[otherPlayerIndex].characterSuggestion;
+    const characters = this.players.map(player => player.characterSuggestion);
+
+    this.players.forEach((player, i) => {
+      const randomCharacterIndex = getRandomIndex(characters.length); 
+      player.character = characters.splice(randomCharacterIndex, 1)[0];
     })
   }
 
