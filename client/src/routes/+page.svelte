@@ -68,12 +68,12 @@
   }
 </script>
 
-<div class="screen">
+<div class="root">
   <div class="content">
     {#if isCharacterSuggested}
-      <article>
-        <h3>Игроки</h3>
-        <section class="players">
+      <article class="screen">
+        <header>Игроки</header>
+        <section class="content players">
           {#each otherPlayers as player (player.name)}
             <div class="row">
               <div class="cell">{player.name}</div>
@@ -85,47 +85,159 @@
             </div>
           {/each}
         </section>
-        {#if isGameStarted}
-          <button on:click={resetGame}>Начать заново</button>
-        {:else}
-          <button on:click={startGame}>Начать</button>
-        {/if}
+        <footer>
+          {#if isGameStarted}
+            <button on:click={resetGame}>Начать заново</button>
+          {:else}
+            <button on:click={startGame}>Начать</button>
+          {/if}
+        </footer>
       </article>
     {:else}
-      <article>
-        <h3>Введите ваше имя и персонажа</h3>
-        <div class="field">
-          <label for="player">Имя</label>
-          <input name="player" bind:value={currentPlayerName} />
-        </div>
-        <div class="field">
-          <label for="character">Персонаж</label>
-          <input name="character" bind:value={characterSuggestion} />
-        </div>
-        <button on:click={submitSuggestion}>Предложить персонажа</button>
+      <article class="screen">
+        <header>Введите ваше имя и персонажа</header>
+        <section class="content form">
+          <div class="field">
+            <label for="player">Имя</label>
+            <input name="player" bind:value={currentPlayerName} />
+          </div>
+          <div class="field">
+            <label for="character">Персонаж</label>
+            <input name="character" bind:value={characterSuggestion} />
+          </div>
+        </section>
+        <footer>
+          <button on:click={submitSuggestion}>Предложить персонажа</button>
+        </footer>
       </article>
     {/if}
   </div>
 </div>
 
+
 <style>
-  .screen {
+  .root {
     width: 100vw;
     height: 100vh;
     display: flex;
     align-items: flex-start;
     justify-content: center;
+
+    --primary-bg-color: #fbea66;
+    --primary-text-color: #201f1f;
+    --bg-color: #373735;
+    --inset-bg-color: #2f2f2d;
+    --input-bg-color: #262624;
+    --focused-input-bg-color: #1c1c1a;
+    --text-color: #DBF4F9;
+
+    --default-v-margin: 8px;
+    --font-family: Verdana;
+
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
   }
 
-  .content {
+  .root > .content {
     max-width: 400px;
+    width: 100%;
+    height: 100%;
+  }
+
+  .screen {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+  }
+
+  .screen > .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--inset-bg-color);
+    flex: 1;
+  }
+
+  .screen > .content.form {
+    padding: var(--default-v-margin) 15px;
+    gap: var(--default-v-margin);
+  }
+
+  .field {
     width: 100%;
   }
 
-  .players {
+  .field > label {
+    margin-bottom: 4px;
+  }
+
+  .field > input {
+    width: 100%;
+    background-color: var(--input-bg-color);
+    border-radius: 0;
+    color: var(--text-color);
+    border: none;
+    border-radius: 0;
+    padding: 8px 16px;
+    font-size: 16px;
+    box-sizing: border-box;
+    font-family: var(--font-family);
+
+  }
+
+  .field > input:focus {
+    border: none;
+    outline: none;
+    background-color: var(--focused-input-bg-color);
+  }
+
+  .screen > header {
+    position: sticky;
+    top: 0;
+    min-height: 50px;
+
+    font-weight: 500;
+    padding: 8px 12px;
+    text-align: center;
+    font-size: 24px;
+
+    font-weight: 500;
+  }
+
+  .screen > footer {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    height: 64px;
+    box-sizing: border-box;
+    padding: var(--default-v-margin) 16px;
+  }
+
+  button {
+    color: var(--primary-text-color);
+    background-color: var(--primary-bg-color);
+    border: none;
+    border-radius: 0;
+    padding: var(--default-v-margin) 12px;
+    font-size: 24px;
+    cursor: pointer;
+    
+  }
+
+  button:hover {
+    background-color: hsl(from var(--primary-bg-color) h s calc(l * 1.2))
+  }
+
+  .screen .content.players {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: auto;
+    grid-auto-rows: min-content;
     gap: 2px;
   }
 
@@ -133,18 +245,16 @@
     display: contents;
   }
 
+  .row:nth-child(2n) .cell {
+    background-color: hsl(from var(--inset-bg-color) h s calc(l * 0.9));
+  }
+
   .players .cell {
-    padding: 2px 5px;
+    padding: 4px 12px;
   }
 
   .field label {
     display: block;
   }
 
-  .content > article {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
 </style>
