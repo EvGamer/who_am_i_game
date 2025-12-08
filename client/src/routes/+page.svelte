@@ -1,5 +1,4 @@
 <script>
-  import { PUBLIC_HOST } from "$env/static/public";
   import { onMount } from "svelte";
 
   const CURRENT_PLAYER_NAME_STORAGE = "current_player_name"; 
