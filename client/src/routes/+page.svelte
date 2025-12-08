@@ -17,7 +17,6 @@
 
   const handleSocketMessage = (event) => {
     const { type, payload } = JSON.parse(event.data);
-    console.log("message", type, payload)
     switch (type) {
       case "game_state_changed":
         players = payload.players;
@@ -75,7 +74,7 @@
       <article class="screen">
         <header>Игроки</header>
         <section class="content players">
-          {#each otherPlayers as player (player.name)}
+          {#each otherPlayers as player}
             <div class="row">
               <div class="cell">{player.name}</div>
               {#if isGameStarted}
@@ -88,9 +87,9 @@
         </section>
         <footer>
           {#if isGameStarted}
-            <button on:click={resetGame}>Начать заново</button>
+            <button onclick={resetGame}>Начать заново</button>
           {:else}
-            <button on:click={startGame}>Начать</button>
+            <button onclick={startGame}>Начать</button>
           {/if}
         </footer>
       </article>
@@ -108,7 +107,7 @@
           </div>
         </section>
         <footer>
-          <button on:click={submitSuggestion}>Предложить персонажа</button>
+          <button onclick={submitSuggestion}>Предложить персонажа</button>
         </footer>
       </article>
     {/if}

@@ -25,12 +25,19 @@ export class GameState {
     }
   }
 
-  submitCharacter(playerName, characterSuggestion) {
-    this.players.push({
+  createPlayer(playerName) {
+    const player = {
       name: playerName,
-      characterSuggestion,
+      characterSuggestion: null,
       character: null,
-    });
+    }
+    this.players.push(player);
+    return player;
+  }
+
+  submitCharacter(playerName, characterSuggestion) {
+    const player = this.players.find((player) => player.name === playerName) ?? this.createPlayer();
+    player.characterSuggestion = characterSuggestion;
     this.emitChange();
   }
 
