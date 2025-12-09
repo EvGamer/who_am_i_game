@@ -17,6 +17,7 @@
 
   const handleSocketMessage = (event) => {
     const { type, payload } = JSON.parse(event.data);
+    console.log("message", type, payload);
     switch (type) {
       case "game_state_changed":
         players = payload.players;
@@ -66,6 +67,7 @@
       type: "game_reset",
     }))
   }
+
 </script>
 
 <div class="root">
