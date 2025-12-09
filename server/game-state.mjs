@@ -45,7 +45,10 @@ export class GameState {
     const characters = this.players.map(player => player.characterSuggestion);
 
     this.players.forEach((player, i) => {
-      const randomCharacterIndex = getRandomIndex(characters.length); 
+      let randomCharacterIndex = getRandomIndex(characters.length); 
+      if (characters[randomCharacterIndex] === player.characterSuggestion) {
+        randomCharacterIndex = (randomCharacterIndex + 1) % characters.length;
+      }
       player.character = characters.splice(randomCharacterIndex, 1)[0];
     })
   }
