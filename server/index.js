@@ -38,6 +38,10 @@ wss.on('connection', (connection) => {
         console.log("Game reset");
         gameState.reset();
         break;
+      case "ping":
+        connection.send(JSON.stringify({
+          type: "pong"
+        }));
       default:
         break;
     }

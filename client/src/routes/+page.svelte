@@ -29,7 +29,7 @@
         firstPlayerName = payload.firstPlayerName;
         break;
       case "ping":
-        socket.send({ type: "pong" });
+        socket.send(JSON.stringify({ type: "pong" }));
       default:
         break;
     }
@@ -43,6 +43,9 @@
     if (socket.readyState === WebSocket.CLOSED) {
       socket.open();
     }
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ type: "ping" }));
+    }
   }
 
   onMount(() => {
@@ -50,6 +53,8 @@
     console.log(currentPlayerName);
 
     connectToSocket();
+
+    setInterval(connectToSocket, 60000);
 
     socket.addEventListener("message", handleSocketMessage);
   });
