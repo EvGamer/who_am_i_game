@@ -9,6 +9,7 @@ export class GameState {
 
     this.players = [];
     this.isStarted = false;
+    this.firstPlayerName = null;
   }
 
   addChangeListener(callback) {
@@ -64,6 +65,7 @@ export class GameState {
   start() {
     this.isStarted = true;
     this.assignPlayerCharacters();
+    this.firstPlayerName = this.players[getRandomIndex(this.players.length)].name;
     this.emitChange();
   }
 

@@ -10,10 +10,10 @@ const wss = new WebSocketServer({ server });
 const gameState = new GameState();
 
 wss.on('connection', (connection) => {
-  const changeListener = ({ isStarted, players }) => {
+  const changeListener = ({ isStarted, players, firstPlayerName }) => {
     connection.send(JSON.stringify({
       type: "game_state_changed",
-      payload: { isStarted, players },
+      payload: { isStarted, players, firstPlayerName },
     }))
   };
 

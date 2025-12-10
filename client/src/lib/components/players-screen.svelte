@@ -2,27 +2,36 @@
   import Screen from "./screen.svelte";
   import Content from "./content.svelte";
 
-  const { players, children, isGameStarted } = $props(); 
+  const { players, children, isGameStarted, firstPlayerName } = $props(); 
 </script>
 
 <Screen footer={children}>
   {#snippet header()}Игроки{/snippet}
-  <Content class="players">
-    {#each players as player}
-      <div class="row">
-        <div class="cell">{player.name}</div>
-        {#if isGameStarted}
-          <div class="cell">{player.character}</div>
-        {:else}
-          <div class="cell">Готов</div>
-        {/if}
-      </div>
-    {/each}
+  <Content>
+    <div class="players">
+      {#each players as player}
+        <div class="row">
+          <div class="cell">{player.name}</div>
+          {#if isGameStarted}
+            <div class="cell">{player.character}</div>
+          {:else}
+            <div class="cell">Готов</div>
+          {/if}
+        </div>
+      {/each}
+      {#if isGameStarted && firstPlayerName}
+        <div class="row">
+          <div class="cell">Первым ходит:</div>
+          <div class="cell">{firstPlayerName}</div>
+        </div>
+      {/if}
+    </div>
   </Content>
 </Screen>
 
 <style>
   .players {
+    width: 100%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: min-content;

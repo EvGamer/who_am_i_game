@@ -13,6 +13,8 @@
   const isCharacterSuggested = $derived(
     players.some((player) => player.name === currentPlayerName && player.characterSuggestion)
   )
+  let firstPlayerName = $state("");
+
   let isGameStarted = $state(false);
 
   let socket = null;
@@ -24,6 +26,7 @@
       case "game_state_changed":
         players = payload.players;
         isGameStarted = payload.isStarted;
+        firstPlayerName = payload.firstPlayerName;
         break;
       case "ping":
         socket.send({ type: "pong" });
@@ -80,7 +83,11 @@
 <div class="root">
   <div class="content">
     {#if isCharacterSuggested || isGameStarted}
-      <PlayersScreen players={otherPlayers} {isGameStarted} >
+      <PlayersScreen
+        players={otherPlayers}
+        {isGameStarted}
+        {firstPlayerName}
+      >
         {#if isGameStarted}
           <Button onclick={resetGame}>Начать заново</Button>
         {:else}
