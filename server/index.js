@@ -27,8 +27,12 @@ wss.on('connection', (connection) => {
 
     switch (type) {
       case "character_submitted":
-        console.log(`"${payload.character}" submitted by ${payload.name}`)
-        gameState.submitCharacter(payload.name, payload.character);
+        console.log(`"${payload.character}" submitted by ${payload.name}. id: ${payload.id}`)
+        gameState.submitCharacter({
+          id: payload.id,
+          name: payload.name,
+          characterSuggestion: payload.character,
+        });
         break;
       case "game_started":
         console.log("Game started");

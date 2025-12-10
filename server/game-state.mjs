@@ -26,9 +26,10 @@ export class GameState {
     }
   }
 
-  createPlayer(playerName) {
+  createPlayer(id) {
     const player = {
-      name: playerName,
+      id,
+      name: null,
       characterSuggestion: null,
       character: null,
     }
@@ -36,8 +37,9 @@ export class GameState {
     return player;
   }
 
-  submitCharacter(playerName, characterSuggestion) {
-    const player = this.players.find((player) => player.name === playerName) ?? this.createPlayer(playerName);
+  submitCharacter({ id, name, characterSuggestion }) {
+    const player = this.players.find((player) => player.id === id) ?? this.createPlayer(id);
+    player.name = name;
     player.characterSuggestion = characterSuggestion;
     this.emitChange();
   }
@@ -47,7 +49,7 @@ export class GameState {
 
     const characters = this.players.map(player => player.characterSuggestion);
 
-    this.players.forEach((player, i) => {
+    this.players.forEach((player) => {
       let randomCharacterIndex = getRandomIndex(characters.length); 
       if (characters[randomCharacterIndex] === player.characterSuggestion) {
         if (characters.length === 1) {

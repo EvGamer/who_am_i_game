@@ -3,9 +3,14 @@
   import PlayersScreen from "$lib/components/players-screen.svelte";
   import Button from "$lib/components/button.svelte";
   import { onMount } from "svelte";
+  import { v4 as getUuidV4 } from "uuid";
 
+  const STORAGE_VERSION_STORAGE = "storage_version";
+  const STORAGE_VERSION = "1";
   const CURRENT_PLAYER_NAME_STORAGE = "current_player_name"; 
+  const CURRENT_PLAYER_ID_STORAGE = "current_player_id";
 
+  let currentPlayerId = $state(null);
   let currentPlayerName = $state("");
   let characterSuggestion = $state("");
   let players = $state([]);
@@ -49,7 +54,16 @@
   }
 
   onMount(() => {
-    currentPlayerName = window.localStorage.getItem(CURRENT_PLAYER_NAME_STORAGE);
+    const prevStorageVersion = window.localStorage.getItem(STORAGE_VERSION_STORAGE);
+    if (prevStorageVersion !== STORAGE_VERSION) {
+      window.localStorage.clear();
+      window.localStorage.setItem(STORAGE_VERSION_STORAGE, STORAGE_VERSION);
+    } else {
+      currentPlayerId = window.localStorage.getItem(CURRENT_PLAYER_ID_STORAGE);
+      currentPlayerName = window.localStorage.getItem(CURRENT_PLAYER_NAME_STORAGE);
+    }
+    if (!currentPlayerId) currentPlayerId = getUuidV4();
+    
     console.log(currentPlayerName);
 
     connectToSocket();
@@ -65,6 +79,7 @@
     socket.send(JSON.stringify({
       type: "character_submitted",
       payload: {
+        id: currentPlayerId,
         name: currentPlayerName,
         character: characterSuggestion,
       },

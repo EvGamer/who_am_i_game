@@ -9,7 +9,7 @@
   {#snippet header()}Игроки{/snippet}
   <Content>
     <div class="players">
-      {#each players as player}
+      {#each players as player (player.id)}
         <div class="row">
           <div class="cell">{player.name}</div>
           {#if isGameStarted}
