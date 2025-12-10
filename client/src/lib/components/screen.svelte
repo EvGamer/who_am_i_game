@@ -37,6 +37,7 @@
     background-color: var(--bg-color);
     display: flex;
     justify-content: center;
+    gap: 16px;
     height: 64px;
     box-sizing: border-box;
     padding: var(--default-v-margin) 16px;

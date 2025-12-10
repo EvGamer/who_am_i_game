@@ -7,7 +7,9 @@
   let {
     player = $bindable(),
     character = $bindable(),
-    submit
+    submit,
+    cancel,
+    isEditing,
   } = $props()
 </script>
 
@@ -22,7 +24,10 @@
     </div>
   </Content>
   {#snippet footer()}
-    <Button onclick={submit}>Предложить персонажа</Button>
+    {#if isEditing}
+      <Button onclick={cancel}>Отменить</Button>
+    {/if}
+    <Button onclick={submit}>Подтвердить</Button>
   {/snippet}
 </Screen>
 

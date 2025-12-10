@@ -16,11 +16,12 @@
   let players = $state([]);
   const otherPlayers = $derived(players.filter((player) => player.name !== currentPlayerName));
   const isCharacterSuggested = $derived(
-    players.some((player) => player.name === currentPlayerName && player.characterSuggestion)
+    players.some((player) => player.id === currentPlayerId && player.characterSuggestion)
   )
   let firstPlayerName = $state("");
 
   let isGameStarted = $state(false);
+  let isEditing = $state(false);
 
   let socket = null;
 
@@ -62,7 +63,10 @@
       currentPlayerId = window.localStorage.getItem(CURRENT_PLAYER_ID_STORAGE);
       currentPlayerName = window.localStorage.getItem(CURRENT_PLAYER_NAME_STORAGE);
     }
-    if (!currentPlayerId) currentPlayerId = getUuidV4();
+    if (!currentPlayerId) {
+      currentPlayerId = getUuidV4();
+      window.localStorage.setItem(CURRENT_PLAYER_ID_STORAGE, currentPlayerId);
+    }
     
     console.log(currentPlayerName);
 
@@ -75,6 +79,7 @@
 
   const submitSuggestion = () => {
     window.localStorage.setItem(CURRENT_PLAYER_NAME_STORAGE, currentPlayerName);
+    isEditing = false;
 
     socket.send(JSON.stringify({
       type: "character_submitted",
@@ -102,7 +107,7 @@
 
 <div class="root">
   <div class="content">
-    {#if isCharacterSuggested || isGameStarted}
+    {#if isCharacterSuggested && !isEditing || isGameStarted}
       <PlayersScreen
         players={otherPlayers}
         {isGameStarted}
@@ -111,14 +116,17 @@
         {#if isGameStarted}
           <Button onclick={resetGame}>Начать заново</Button>
         {:else}
+          <Button onclick={() => isEditing = true}>Изменить</Button>
           <Button onclick={startGame}>Начать</Button>
         {/if}
       </PlayersScreen>
     {:else}
       <JoinScreen 
+        {isEditing}
         bind:player={currentPlayerName}
         bind:character={characterSuggestion}
         submit={submitSuggestion}
+        cancel={() => isEditing = false}
       />
     {/if}
   </div>
