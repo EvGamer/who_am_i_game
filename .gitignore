@@ -140,3 +140,5 @@ vite.config.ts.timestamp-*
 
 .vscode
 .idea
+
+server/.characters.log
