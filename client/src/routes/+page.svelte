@@ -15,16 +15,17 @@
   let characterSuggestion = $state("");
   let players = $state([]);
   const otherPlayers = $derived(players.filter((player) => player.name !== currentPlayerName));
-  const isCharacterSuggested = $derived(
-    players.some((player) => player.id === currentPlayerId && player.characterSuggestion)
-  )
-  let firstPlayerName = $state("");
 
+  const currentPlayer = $derived(players.find(player => player.id === currentPlayerId));
+  const isCharacterSuggested = $derived(Boolean(currentPlayer?.characterSuggestion));
+  const isHotjoined = $derived(!currentPlayer?.character);
+  let isInGame = $derived(currentPlayer != null);
+
+  let firstPlayerName = $state("");
   let isGameStarted = $state(false);
   let isEditing = $state(false);
 
   let socket = null;
-
   const handleSocketMessage = (event) => {
     const { type, payload } = JSON.parse(event.data);
     console.log("message", type, payload);
@@ -77,17 +78,36 @@
     socket.addEventListener("message", handleSocketMessage);
   });
 
-  const submitSuggestion = () => {
+  const edit = () => isEditing = true;
+  const submit = () => {
     window.localStorage.setItem(CURRENT_PLAYER_NAME_STORAGE, currentPlayerName);
     isEditing = false;
 
+    const payload = {
+      id: currentPlayerId,
+      name: currentPlayerName,
+      character: characterSuggestion,
+    }
+
+    if (isGameStarted && isInGame) {
+      socket.send(JSON.stringify({
+        type: "hotjoin_character_submitted",
+        payload,
+      }));
+      return;
+    }
+
+    if (isGameStarted && !isInGame) {
+      socket.send(JSON.stringify({
+        type: "hotjoined",
+        payload,
+      }))
+      return;
+    }
+
     socket.send(JSON.stringify({
       type: "character_submitted",
-      payload: {
-        id: currentPlayerId,
-        name: currentPlayerName,
-        character: characterSuggestion,
-      },
+      payload,
     }));
   };
 
@@ -102,30 +122,36 @@
       type: "game_reset",
     }))
   }
-
 </script>
 
 <div class="root">
   <div class="content">
-    {#if isCharacterSuggested && !isEditing || isGameStarted}
+    {#if !isEditing && (isGameStarted || isCharacterSuggested)}
       <PlayersScreen
         players={otherPlayers}
         {isGameStarted}
         {firstPlayerName}
       >
         {#if isGameStarted}
+          {#if isInGame && !isHotjoined}
+            <Button onclick={edit}>Новый персонаж</Button>
+          {:else if !isInGame}
+            <Button onclick={edit}>Присоединиться</Button>
+          {/if}
           <Button onclick={resetGame}>Начать заново</Button>
         {:else}
-          <Button onclick={() => isEditing = true}>Изменить</Button>
+          <Button onclick={edit}>Изменить</Button>
           <Button onclick={startGame}>Начать</Button>
         {/if}
       </PlayersScreen>
     {:else}
       <JoinScreen 
         {isEditing}
+        {isGameStarted}
+        {isInGame}
         bind:player={currentPlayerName}
         bind:character={characterSuggestion}
-        submit={submitSuggestion}
+        submit={submit}
         cancel={() => isEditing = false}
       />
     {/if}

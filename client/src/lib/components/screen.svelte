@@ -38,7 +38,7 @@
     display: flex;
     justify-content: center;
     gap: 16px;
-    height: 64px;
+    min-height: 64px;
     box-sizing: border-box;
     padding: var(--default-v-margin) 16px;
   }

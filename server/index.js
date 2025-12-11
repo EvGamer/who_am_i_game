@@ -34,6 +34,14 @@ wss.on('connection', (connection) => {
           characterSuggestion: payload.character,
         });
         break;
+      case "hotjoined":
+        console.log(`${payload.name} hotjoined. id: ${payload.id}"`);
+        gameState.hotjoin(payload.id, payload.name);
+        break;
+      case "hotjoin_character_submitted":
+        console.log(`"${payload.character}" submitted by ${gameState.getPlayer(payload.id)?.name}. id: ${payload.id}`);
+        gameState.submitHotjoinCharacter(payload.character);
+        break;
       case "game_started":
         console.log("Game started");
         gameState.start();
@@ -46,6 +54,7 @@ wss.on('connection', (connection) => {
         connection.send(JSON.stringify({
           type: "pong"
         }));
+        break;
       default:
         break;
     }

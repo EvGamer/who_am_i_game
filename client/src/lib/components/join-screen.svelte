@@ -10,6 +10,8 @@
     submit,
     cancel,
     isEditing,
+    isGameStarted,
+    isInGame
   } = $props()
 </script>
 
@@ -19,8 +21,12 @@
   {/snippet}
   <Content>
     <div class="form">
-      <Field label="Ваше имя" bind:value={player} name="player"/>
-      <Field label="Персонаж для других" bind:value={character} name="character" />
+      {#if !isGameStarted || !isInGame}
+        <Field label="Ваше имя" bind:value={player} name="player"/>
+      {/if}
+      {#if !isGameStarted || isInGame}
+        <Field label="Персонаж для других" bind:value={character} name="character" />
+      {/if}
     </div>
   </Content>
   {#snippet footer()}
