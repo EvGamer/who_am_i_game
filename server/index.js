@@ -60,6 +60,12 @@ wss.on('connection', (connection) => {
         console.log("Game reset");
         gameState.reset();
         break;
+      case "character_replaced":
+        addCharacterToFile(payload.character);
+        const player = gameState.replaceCharacter(payload.id, payload.character);
+        if (player) console.log(`Character of ${player.name} changed to ${player.character}. id: ${player.id}`);
+        else console.log(`Player ${payload.id} is not found`);
+        break;
       case "ping":
         connection.send(JSON.stringify({
           type: "pong"

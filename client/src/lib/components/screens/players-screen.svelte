@@ -1,8 +1,9 @@
 <script>
   import Screen from "./screen.svelte";
-  import Content from "./content.svelte";
+  import Content from "../ui/content.svelte";
+  import Cog from "../icons/cog.svelte";
 
-  const { players, children, isGameStarted, firstPlayerName } = $props(); 
+  const { players, children, isGameStarted, firstPlayerName, editPlayer } = $props(); 
 </script>
 
 <Screen footer={children}>
@@ -13,7 +14,15 @@
         <div class="row">
           <div class="cell">{player.name}</div>
           {#if isGameStarted}
-            <div class="cell">{player.character}</div>
+            <div class="cell name-cell">
+              <div class="name">{player.character}</div>
+              <Cog
+                class="icon"
+                role="button"
+                tab-index="0"
+                onclick={() => editPlayer(player)}
+              />
+            </div>
           {:else}
             <div class="cell">Готов</div>
           {/if}
@@ -48,5 +57,26 @@
 
   .cell {
     padding: 4px 12px;
+  }
+
+  .name-cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .name {
+    flex: 1;
+  }
+
+  .cell :global(.icon) {
+    height: 1em;
+    width: 1em;
+    cursor: pointer;
+    padding: 2px;
+  }
+
+  .cell :global(.icon):hover {
+    background-color: hsl(from var(--inset-bg-color) h s calc(l * 1.3));
   }
 </style>

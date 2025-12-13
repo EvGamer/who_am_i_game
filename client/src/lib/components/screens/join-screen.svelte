@@ -1,8 +1,9 @@
 <script>
   import Screen from "./screen.svelte";
-  import Content from "./content.svelte";
-  import Field from "./field.svelte";
-  import Button from "./button.svelte";
+  import Content from "../ui/content.svelte";
+  import Field from "../ui/field.svelte";
+  import Button from "../ui/button.svelte";
+    import FormContainer from "../ui/form-container.svelte";
 
   let {
     player = $bindable(),
@@ -20,14 +21,14 @@
     Введите ваше имя и персонажа
   {/snippet}
   <Content>
-    <div class="form">
+    <FormContainer>
       {#if !isGameStarted || !isInGame}
         <Field label="Ваше имя" bind:value={player} name="player"/>
       {/if}
       {#if !isGameStarted || isInGame}
         <Field label="Персонаж для других" bind:value={character} name="character" />
       {/if}
-    </div>
+    </FormContainer>
   </Content>
   {#snippet footer()}
     {#if isEditing}
@@ -36,14 +37,3 @@
     <Button onclick={submit}>Подтвердить</Button>
   {/snippet}
 </Screen>
-
-<style>
-  .form {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    box-sizing: border-box;
-    padding: var(--default-v-margin) 15px;
-    gap: var(--default-v-margin);
-  }
-</style>

@@ -1,9 +1,11 @@
 <script>
-  import JoinScreen from "$lib/components/join-screen.svelte";
-  import PlayersScreen from "$lib/components/players-screen.svelte";
-  import Button from "$lib/components/button.svelte";
+  import JoinScreen from "$lib/components/screens/join-screen.svelte";
+  import PlayersScreen from "$lib/components/screens/players-screen.svelte";
+  import Button from "$lib/components/ui/button.svelte";
+  import EditCharacterScreen from "$lib/components/screens/edit-character-screen.svelte";
   import { onMount } from "svelte";
   import { v4 as getUuidV4 } from "uuid";
+  import { SocketApi } from "$lib/socket-api";
 
   const STORAGE_VERSION_STORAGE = "storage_version";
   const STORAGE_VERSION = "1";
@@ -21,39 +23,23 @@
   const isHotjoined = $derived(!currentPlayer?.character);
   let isInGame = $derived(currentPlayer != null);
 
+  let editedPlayer = $state(null);
+
   let firstPlayerName = $state("");
   let isGameStarted = $state(false);
   let isEditing = $state(false);
 
-  let socket = null;
-  const handleSocketMessage = (event) => {
-    const { type, payload } = JSON.parse(event.data);
-    console.log("message", type, payload);
-    switch (type) {
-      case "game_state_changed":
-        players = payload.players;
-        isGameStarted = payload.isStarted;
-        firstPlayerName = payload.firstPlayerName;
-        break;
-      case "ping":
-        socket.send(JSON.stringify({ type: "pong" }));
-      default:
-        break;
-    }
-  }
+  const socketApi = new SocketApi();
+  socketApi.addMessageListener("game_state_changed", (payload) => {
+    console.log("handle game state change");
+    players = payload.players;
+    isGameStarted = payload.isStarted;
+    firstPlayerName = payload.firstPlayerName;
+  });
 
-  function connectToSocket() {
-    if (!socket) {
-      const hostname = window.location.hostname;
-      socket = new WebSocket(`http://${hostname}/api/`);
-    }
-    if (socket.readyState === WebSocket.CLOSED) {
-      socket.open();
-    }
-    if (socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({ type: "ping" }));
-    }
-  }
+  socketApi.addMessageListener("ping", () => {
+    socketApi.send("pong");
+  })
 
   onMount(() => {
     const prevStorageVersion = window.localStorage.getItem(STORAGE_VERSION_STORAGE);
@@ -71,14 +57,18 @@
     
     console.log(currentPlayerName);
 
-    connectToSocket();
+    socketApi.connect();
 
-    setInterval(connectToSocket, 60000);
-
-    socket.addEventListener("message", handleSocketMessage);
+    setInterval(() => socketApi.connect(), 60000);
   });
 
   const edit = () => isEditing = true;
+
+  const editPlayer = (player) => {
+    editedPlayer = { ...player };
+    console.log("editPlayer", editedPlayer);
+  }
+
   const submit = () => {
     window.localStorage.setItem(CURRENT_PLAYER_NAME_STORAGE, currentPlayerName);
     isEditing = false;
@@ -90,45 +80,62 @@
     }
 
     if (isGameStarted && isInGame) {
-      socket.send(JSON.stringify({
-        type: "hotjoin_character_submitted",
-        payload,
-      }));
+      socketApi.send("hotjoin_character_submitted", payload);
       return;
     }
 
     if (isGameStarted && !isInGame) {
-      socket.send(JSON.stringify({
-        type: "hotjoined",
-        payload,
-      }))
+      socketApi.send("hotjoined", payload);
       return;
     }
 
-    socket.send(JSON.stringify({
-      type: "character_submitted",
-      payload,
-    }));
+    socketApi.send("character_submitted", payload);
   };
 
   const startGame = () => {
-    socket.send(JSON.stringify({
-      type: "game_started",
-    }))
+    socketApi.send("game_started");
   };
 
   const resetGame = () => {
-    socket.send(JSON.stringify({
-      type: "game_reset",
-    }))
+    socketApi.send("game_reset");
   }
+
+  const replaceCharacter = () => {
+    socketApi.send("character_replaced", {
+      id: editedPlayer.id,
+      character: editedPlayer.character,
+    })
+    editedPlayer = null;
+  }
+  $inspect("isCharacterSuggested", isCharacterSuggested);
+  $inspect("currentPlayerId", currentPlayerId);
+  $inspect("players", players);
+  $inspect("currentPlayer", currentPlayer);
+  $inspect("editedPlayer", editedPlayer)
 </script>
 
 <div class="root">
   <div class="content">
-    {#if !isEditing && (isGameStarted || isCharacterSuggested)}
+    {#if isEditing || !isGameStarted && !isCharacterSuggested}
+      <JoinScreen 
+        {isEditing}
+        {isGameStarted}
+        {isInGame}
+        bind:player={currentPlayerName}
+        bind:character={characterSuggestion}
+        {submit}
+        cancel={() => isEditing = false}
+      />
+    {:else if editedPlayer != null}
+      <EditCharacterScreen 
+        player={editedPlayer.name}
+        bind:character={editedPlayer.character}
+        submit={replaceCharacter}
+      />
+    {:else}
       <PlayersScreen
         players={otherPlayers}
+        {editPlayer}
         {isGameStarted}
         {firstPlayerName}
       >
@@ -144,16 +151,6 @@
           <Button onclick={startGame}>Начать</Button>
         {/if}
       </PlayersScreen>
-    {:else}
-      <JoinScreen 
-        {isEditing}
-        {isGameStarted}
-        {isInGame}
-        bind:player={currentPlayerName}
-        bind:character={characterSuggestion}
-        submit={submit}
-        cancel={() => isEditing = false}
-      />
     {/if}
   </div>
 </div>

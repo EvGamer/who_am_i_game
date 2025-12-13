@@ -51,6 +51,14 @@ export class GameState {
     return this.players.find((player) => player.id === id);
   }
 
+  replaceCharacter(id, character) {
+    const player = this.getPlayer(id);
+    if (!player) return null;
+    player.character = character;
+    this.emitChange();
+    return player;
+  }
+
   hotjoin(id, name) {
     const player = this.getPlayer(id);
     if (player) return;
