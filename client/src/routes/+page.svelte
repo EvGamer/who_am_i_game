@@ -31,7 +31,6 @@
 
   const socketApi = new SocketApi();
   socketApi.addMessageListener("game_state_changed", (payload) => {
-    console.log("handle game state change");
     players = payload.players;
     isGameStarted = payload.isStarted;
     firstPlayerName = payload.firstPlayerName;
@@ -59,14 +58,13 @@
 
     socketApi.connect();
 
-    setInterval(() => socketApi.connect(), 60000);
+    setInterval(() => socketApi.connect(), 5000);
   });
 
   const edit = () => isEditing = true;
 
   const editPlayer = (player) => {
     editedPlayer = { ...player };
-    console.log("editPlayer", editedPlayer);
   }
 
   const submit = () => {
@@ -107,11 +105,6 @@
     })
     editedPlayer = null;
   }
-  $inspect("isCharacterSuggested", isCharacterSuggested);
-  $inspect("currentPlayerId", currentPlayerId);
-  $inspect("players", players);
-  $inspect("currentPlayer", currentPlayer);
-  $inspect("editedPlayer", editedPlayer)
 </script>
 
 <div class="root">

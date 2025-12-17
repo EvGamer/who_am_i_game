@@ -5,7 +5,6 @@ export class SocketApi {
 
     this._handleMessage = (event) => {
       const { type, payload } = JSON.parse(event.data);
-      console.log("message", type, payload);
 
       this._callMessageListenersOfType(type, payload);
     }
@@ -22,10 +21,10 @@ export class SocketApi {
       this._socket = new WebSocket(`http://${hostname}/api/`);
       this._socket.addEventListener("message", this._handleMessage);
     }
-    if (this._socket.readyState === WebSocket.CLOSED) {
-      this._socket.open();
+    if (this._socket?.readyState === WebSocket.CLOSED) {
+      this._socket?.open();
     }
-    if (this._socket.readyState === WebSocket.OPEN) {
+    if (this._socket?.readyState === WebSocket.OPEN) {
       this.send("ping");
     }
   }
