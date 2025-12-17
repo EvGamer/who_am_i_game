@@ -27,6 +27,7 @@ export class SocketApi {
     if (this._socket?.readyState === WebSocket.OPEN) {
       this.send("ping");
     }
+    return this._socket?.readyState === WebSocket.OPEN;
   }
 
   send(type, payload) {

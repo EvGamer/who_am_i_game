@@ -12,6 +12,8 @@
   const CURRENT_PLAYER_NAME_STORAGE = "current_player_name"; 
   const CURRENT_PLAYER_ID_STORAGE = "current_player_id";
 
+  let isConnected = $state(false);
+
   let currentPlayerId = $state(null);
   let currentPlayerName = $state("");
   let characterSuggestion = $state("");
@@ -56,9 +58,9 @@
     
     console.log(currentPlayerName);
 
-    socketApi.connect();
+    isConnected = socketApi.connect();
 
-    setInterval(() => socketApi.connect(), 5000);
+    setInterval(() => isConnected = socketApi.connect(), 5000);
   });
 
   const edit = () => isEditing = true;
@@ -109,6 +111,7 @@
 
 <div class="root">
   <div class="content">
+    <div class="connection" class:connected={isConnected}></div>
     {#if isEditing || !isGameStarted && !isCharacterSuggested}
       <JoinScreen 
         {isEditing}
@@ -159,6 +162,8 @@
 
     --primary-bg-color: #fbea66;
     --primary-text-color: #201f1f;
+    --success-bg-color: #78b138;
+    --failure-bg-color: #b1385c;
     --bg-color: #373735;
     --inset-bg-color: #2f2f2d;
     --input-bg-color: #262624;
@@ -171,6 +176,15 @@
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: var(--font-family);
+  }
+
+  .connection {
+    width: 100%;
+    height: 3px;
+    background-color: var(--failure-bg-color);
+  }
+  .connection.connected {
+    background-color: var(--success-bg-color);
   }
 
   .root > .content {
