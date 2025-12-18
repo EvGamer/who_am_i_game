@@ -1,17 +1,21 @@
 <script>
-  import Screen from "./screen.svelte";
-  import Content from "../ui/content.svelte";
-  import Cog from "../icons/cog.svelte";
+  import Screen from "../screen.svelte";
+  import Content from "../../ui/content.svelte";
+  import Cog from "../../icons/cog.svelte";
+  import DropEdge from "./drop-edge.svelte";
 
   const { players, children, isGameStarted, firstPlayerName, editPlayer } = $props(); 
+
+  let activeDropzoneIndex = $state(null);
 </script>
 
 <Screen footer={children}>
   {#snippet header()}Игроки{/snippet}
   <Content>
     <div class="players">
-      {#each players as player (player.id)}
-        <div class="row">
+      <DropEdge bind:activeIndex={activeDropzoneIndex} index={0} />
+      {#each players as player (player.id, i)}
+        <div class="row" draggable>
           <div class="cell">{player.name}</div>
           {#if isGameStarted}
             <div class="cell name-cell">
@@ -27,6 +31,7 @@
             <div class="cell">Готов</div>
           {/if}
         </div>
+        <DropEdge bind:activeIndex={activeDropzoneIndex} index={i + 1} />
       {/each}
       {#if isGameStarted && firstPlayerName}
         <div class="row">
@@ -40,9 +45,10 @@
 
 <style>
   .players {
+    --columns: 2;
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(--columns, 1fr);
     grid-auto-rows: min-content;
     gap: 2px;
   }
@@ -54,6 +60,7 @@
   .row:nth-child(2n) .cell {
     background-color: hsl(from var(--inset-bg-color) h s calc(l * 0.9));
   }
+
 
   .cell {
     padding: 4px 12px;
