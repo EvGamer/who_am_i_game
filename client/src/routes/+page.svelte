@@ -127,6 +127,7 @@
         player={editedPlayer.name}
         bind:character={editedPlayer.character}
         submit={replaceCharacter}
+        cancel={() => editedPlayer = null}
       />
     {:else}
       <PlayersScreen
